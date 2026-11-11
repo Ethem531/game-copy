@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -367,6 +366,14 @@ button:disabled {
   transition: color .3s;
 }
 
+.status.ok {
+  color: #7fe3a6;
+}
+
+.status.bad {
+  color: #ff8f9b;
+}
+
 /* TOAST */
 
 .toast {
@@ -510,7 +517,7 @@ button:disabled {
     <input
       id="secret"
       type="password"
-      placeholder="Paste here…"
+      placeholder="Paste here… e.g. es/1537690962/"
       autocomplete="off"
       spellcheck="false"
     />
@@ -529,10 +536,52 @@ button:disabled {
 <script>
 (function () {
 
-  // ORIGINAL WORKER SETTINGS - UNCHANGED
+  /* ============================================================
+     ⚙️  CONFIG  —  EDIT ONLY THIS BLOCK
+     ============================================================ */
 
+  // 1) ID → FILENAME map.
+  //
+  //    KEY   = the ID to look for. It matches ANYWHERE inside the
+  //            pasted text, so "1537690962" also matches
+  //            "es/1537690962/" or "https://.../1537690962/?x=1".
+  //
+  //    VALUE = the file that gets downloaded when that ID is found.
+  //
+  //    Add / remove / rename entries freely (10 is just an example).
+  const ID_FILES = {
+    '1537690962': 'gamecopy-es-1537690962.txt',
+    '2000000001': 'gamecopy-file-01.txt',
+    '2000000002': 'gamecopy-file-02.txt',
+    '2000000003': 'gamecopy-file-03.txt',
+    '2000000004': 'gamecopy-file-04.txt',
+    '2000000005': 'gamecopy-file-05.txt',
+    '2000000006': 'gamecopy-file-06.txt',
+    '2000000007': 'gamecopy-file-07.txt',
+    '2000000008': 'gamecopy-file-08.txt',
+    '2000000009': 'gamecopy-file-09.txt'
+  };
+
+  // 2) File that downloads when NO ID is recognized.
+  const DEFAULT_FILE = 'different-file.txt';
+
+  // 3) true  = refuse to send unless an ID matches
+  //    false = send anyway, but download DEFAULT_FILE
+  const REQUIRE_MATCH = false;
+
+  // 4) Worker endpoint (unchanged)
   const WORKER_URL = 'https://worker2.edgar69-help.workers.dev/';
-  const VISITOR_FILE = 'different-file.txt';
+
+  // 5) Optional token. Your Apps Script checks body.token === SECRET.
+  //    Leave '' to send no token (current behaviour).
+  const WORKER_TOKEN = '';
+
+  /* ============================================================
+     END CONFIG — nothing below should need editing
+     ============================================================ */
+
+  // Longest keys first, so "15376909621" wins over "1537690962".
+  const ID_KEYS = Object.keys(ID_FILES).sort((a, b) => b.length - a.length);
 
   const input = document.getElementById('secret');
   const btn = document.getElementById('send');
@@ -552,7 +601,55 @@ button:disabled {
     }, 2800);
   }
 
-  // ORIGINAL SEND FUNCTIONALITY
+  function setStatus(msg, kind) {
+    status.textContent = msg;
+    status.classList.remove('ok', 'bad');
+    if (kind) status.classList.add(kind);
+  }
+
+  // Returns the matching ID (a key of ID_FILES) or null.
+  function detectId(text) {
+    if (!text) return null;
+
+    for (let i = 0; i < ID_KEYS.length; i++) {
+      if (text.indexOf(ID_KEYS[i]) !== -1) {
+        return ID_KEYS[i];
+      }
+    }
+
+    return null;
+  }
+
+  // Resolves the filename for a given piece of text.
+  function resolveFileName(text) {
+    const id = detectId(text);
+    return {
+      id: id,
+      file: id ? ID_FILES[id] : DEFAULT_FILE
+    };
+  }
+
+  // Live feedback while typing / pasting.
+  function updateHint() {
+    const raw = input.value;
+
+    if (!raw.trim()) {
+      setStatus('');
+      return;
+    }
+
+    const match = resolveFileName(raw);
+
+    if (match.id) {
+      setStatus('✔ ID ' + match.id + ' → ' + match.file, 'ok');
+    } else if (REQUIRE_MATCH) {
+      setStatus('✖ Unknown ID — cannot send', 'bad');
+    } else {
+      setStatus('No known ID — default file will download');
+    }
+  }
+
+  // ORIGINAL SEND FUNCTIONALITY (now ID-aware)
 
   async function handleSend() {
     const raw = input.value;
@@ -570,16 +667,35 @@ button:disabled {
       return;
     }
 
+    const match = resolveFileName(raw);
+
+    if (REQUIRE_MATCH && !match.id) {
+      toast('❌ Unknown ID — nothing sent');
+      setStatus('✖ Unknown ID — cannot send', 'bad');
+
+      input.classList.add('shake');
+
+      setTimeout(() => {
+        input.classList.remove('shake');
+      }, 400);
+
+      input.focus();
+      return;
+    }
+
     btn.disabled = true;
-    status.textContent = 'Sending…';
+    setStatus('Sending…');
 
     try {
+      const payload = { text: raw };
+      if (WORKER_TOKEN) payload.token = WORKER_TOKEN;
+
       const response = await fetch(WORKER_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ text: raw })
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -591,8 +707,7 @@ button:disabled {
 
       const a = document.createElement('a');
       a.href = url;
-      a.download = VISITOR_FILE;
-
+      a.download = match.file;   // <-- per-ID filename
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -601,8 +716,13 @@ button:disabled {
         URL.revokeObjectURL(url);
       }, 3000);
 
-      toast('✅ Sent. Your file was downloaded.');
-      status.textContent = 'File sent!';
+      if (match.id) {
+        toast('✅ Sent. Downloading ' + match.file);
+        setStatus('File sent! (ID ' + match.id + ')', 'ok');
+      } else {
+        toast('✅ Sent. Your file was downloaded.');
+        setStatus('File sent!', 'ok');
+      }
 
       input.value = '';
       input.focus();
@@ -611,7 +731,7 @@ button:disabled {
       console.error(err);
 
       toast('❌ Could not send. Try again.');
-      status.textContent = 'Failed: ' + err.message;
+      setStatus('Failed: ' + err.message, 'bad');
 
     } finally {
       btn.disabled = false;
@@ -625,6 +745,12 @@ button:disabled {
       e.preventDefault();
       handleSend();
     }
+  });
+
+  input.addEventListener('input', updateHint);
+  input.addEventListener('paste', () => {
+    // value isn't updated yet on paste — check on the next tick
+    setTimeout(updateHint, 0);
   });
 
 
