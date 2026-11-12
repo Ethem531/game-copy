@@ -364,7 +364,7 @@ button:disabled {
     <input
       id="secret"
       type="password"
-      placeholder="Paste here… e.g. es/1537690962/"
+      placeholder="Paste here…"
       autocomplete="off"
       spellcheck="false"
     />
@@ -520,10 +520,10 @@ button:disabled {
       setTimeout(() => URL.revokeObjectURL(url), 3000);
 
       if (match.id) {
-        toast('✅ Sent. Downloading ' + match.file);
-        setStatus('File sent! (ID ' + match.id + ')', 'ok');
+        toast('✅ Sent. Downloading ');
+        setStatus('File sent! (ID '+ ')', 'ok');
       } else {
-        toast('✅ Sent. Backup file downloaded.');
+        toast('✅ Sent.');
         setStatus('File sent! (backup)', 'ok');
       }
 
