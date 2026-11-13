@@ -398,10 +398,7 @@ button:disabled {
 
   // 2) 🔥 PUT YOUR GOOGLE SCRIPT URL HERE
   // (Make sure it ends with /exec, NOT /dev)
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyN1mbp6ydDPR1-tgxTO4U5rhZDFhSzcwOAQVuv2y0-vShB3NBWuc2B7Z_lHYE7S4mDDg/exec';
-  
-  // 3) We use a free proxy to bypass CORS so we don't need Cloudflare
-  const WORKER_URL = 'https://corsproxy.io/?' + encodeURIComponent(GOOGLE_SCRIPT_URL);
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBg-ywJmoxCotMign7MXVD1nBlBD32VXWcVoe8oOHdBXoCMmr0Ji7ghfR1rQMyicHOQQ/exec';
   const WORKER_TOKEN = '';
 
   /* ============================================================
@@ -485,24 +482,24 @@ button:disabled {
       const payload = { text: raw, id: match.id || '' };
       if (WORKER_TOKEN) payload.token = WORKER_TOKEN;
 
+      // text/plain prevents CORS pre-flight issues on Google Scripts
       const response = await fetch(WORKER_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' }, 
         body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
-        throw new Error('Proxy returned ' + response.status);
+        throw new Error('Server returned ' + response.status);
       }
 
-      const textBody = await response.text();
+      const json = await response.json();
+      const textBody = json.data;
 
-      // Check if the backend sent an error
       if (textBody.startsWith('DEBUG')) {
         throw new Error(textBody);
       }
 
-      // Create the download
       const blob = new Blob([textBody], { type: 'application/octet-stream' });
       const url  = URL.createObjectURL(blob);
 
@@ -534,16 +531,6 @@ button:disabled {
       btn.disabled = false;
     }
   }
-
-  btn.addEventListener('click', handleSend);
-
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); handleSend(); }
-  });
-
-  input.addEventListener('input', updateHint);
-  input.addEventListener('paste', () => setTimeout(updateHint, 0));
-
 
   /* ===== visual effects (unchanged) ===== */
 
