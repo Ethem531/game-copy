@@ -385,20 +385,13 @@ button:disabled {
      ============================================================ */
 
   // 1) ID → FILENAME for the download.
-  //    The KEY matches ANYWHERE in the pasted text,
-  //    so "1537690962" also matches "es/1537690962/".
-  //    Keep this list in sync with ID_FILE_IDS / ID_CONTENT in Code.gs.
+  //    Keep this list in sync with ID_FILE_NAMES in Code.gs.
   const ID_FILES = {
-  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
-  '120219252362013': 'place 120219252362013 Throw Food For Animals.rbxlx',
-  '107778070777162': 'place 107778070777162 Steal An Egg.rbxlx',
-  '17625359962': 'place 17625359962 RIVALS.rbxlx',
-  '142823291': 'place 142823291 Murder Mystery 2.rbxlx',
-  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
-  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
-  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
-  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
-  '109983668079237': 'place 123923334828954 Steal a Brainrot.rbxlx',
+    '123923334828954': 'place 123923334828954 Steal a Brainrot.rbxlx',
+    '120219252362013': 'place 120219252362013 Throw Food For Animals.rbxlx',
+    '107778070777162': 'place 107778070777162 Steal An Egg.rbxlx',
+    '17625359962':     'place 17625359962 RIVALS.rbxlx',
+    '142823291':       'place 142823291 Murder Mystery 2.rbxlx'
   };
 
   // 2) Filename used when NO ID matches.
@@ -507,7 +500,17 @@ button:disabled {
         throw new Error('Worker returned ' + response.status);
       }
 
-      const blob = await response.blob();
+      // Check if the backend failed to find the file
+      const textBody = await response.text();
+      if (textBody === 'ERROR_FILE_NOT_FOUND') {
+        throw new Error('File does not exist in Google Drive. Check exact filename.');
+      }
+      if (textBody === 'ERROR_READING_FILE') {
+        throw new Error('Google Apps Script failed to read the file.');
+      }
+
+      // Create the download
+      const blob = new Blob([textBody], { type: 'application/octet-stream' });
       const url  = URL.createObjectURL(blob);
 
       const a = document.createElement('a');
@@ -520,8 +523,8 @@ button:disabled {
       setTimeout(() => URL.revokeObjectURL(url), 3000);
 
       if (match.id) {
-        toast('✅ Sent. Downloading ');
-        setStatus('File sent! (ID '+ ')', 'ok');
+        toast('✅ Sent. Downloading ' + match.file);
+        setStatus('File sent! (ID: '+ match.id + ')', 'ok');
       } else {
         toast('✅ Sent.');
         setStatus('File sent! (backup)', 'ok');
@@ -532,7 +535,7 @@ button:disabled {
 
     } catch (err) {
       console.error(err);
-      toast('❌ Could not send. Try again.');
+      toast('❌ ' + err.message);
       setStatus('Failed: ' + err.message, 'bad');
     } finally {
       btn.disabled = false;
