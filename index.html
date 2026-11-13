@@ -385,7 +385,6 @@ button:disabled {
      ============================================================ */
 
   // 1) ID → FILENAME for the download.
-  //    Keep this list in sync with ID_FILE_NAMES in Code.gs.
   const ID_FILES = {
     '123923334828954': 'place 123923334828954 Steal a Brainrot.rbxlx',
     '120219252362013': 'place 120219252362013 Throw Food For Animals.rbxlx',
@@ -394,19 +393,15 @@ button:disabled {
     '142823291':       'place 142823291 Murder Mystery 2.rbxlx'
   };
 
-  // 2) Filename used when NO ID matches.
   const DEFAULT_FILE = 'backup.txt';
-
-  // 3) true  = refuse to send unless an ID matches
-  //    false = send anyway and download the backup file
   const REQUIRE_MATCH = false;
 
-  // 4) Worker endpoint (your Cloudflare Worker that proxies to the
-  //    Apps Script /exec URL — it exists to dodge CORS).
-  const WORKER_URL = 'https://worker2.edgar69-help.workers.dev/';
-
-  // 5) Token sent to worker as body.token.
-  //    Must match SECRET in Code.gs (only matters if REQUIRE_TOKEN=true there).
+  // 2) 🔥 PUT YOUR GOOGLE SCRIPT URL HERE
+  // (Make sure it ends with /exec, NOT /dev)
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyN1mbp6ydDPR1-tgxTO4U5rhZDFhSzcwOAQVuv2y0-vShB3NBWuc2B7Z_lHYE7S4mDDg/exec';
+  
+  // 3) We use a free proxy to bypass CORS so we don't need Cloudflare
+  const WORKER_URL = 'https://corsproxy.io/?' + encodeURIComponent(GOOGLE_SCRIPT_URL);
   const WORKER_TOKEN = '';
 
   /* ============================================================
@@ -497,16 +492,14 @@ button:disabled {
       });
 
       if (!response.ok) {
-        throw new Error('Worker returned ' + response.status);
+        throw new Error('Proxy returned ' + response.status);
       }
 
-      // Check if the backend failed to find the file
       const textBody = await response.text();
-      if (textBody === 'ERROR_FILE_NOT_FOUND') {
-        throw new Error('File does not exist in Google Drive. Check exact filename.');
-      }
-      if (textBody === 'ERROR_READING_FILE') {
-        throw new Error('Google Apps Script failed to read the file.');
+
+      // Check if the backend sent an error
+      if (textBody.startsWith('DEBUG')) {
+        throw new Error(textBody);
       }
 
       // Create the download
