@@ -104,7 +104,6 @@ button:disabled{opacity:.55;cursor:default;transform:none}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;scroll-behavior:auto !important}}
 </style>
 </head>
-
 <body>
 
 <div class="ambient one"></div>
@@ -127,7 +126,9 @@ button:disabled{opacity:.55;cursor:default;transform:none}
     <p class="status" id="status"></p>
 
     <p class="consent">
-      <strong>Download:</strong> By pressing Send!
+      <strong>Notice:</strong> By pressing Send you agree that your
+      pasted text is saved to our server. Do not paste passwords,
+      cookies, or private tokens.
     </p>
   </main>
 </section>
@@ -198,7 +199,7 @@ button:disabled{opacity:.55;cursor:default;transform:none}
 (function () {
 
 /* =========================================
-   CONFIG — paste your Apps Script /exec URL
+   CONFIG — paste your Apps Script /exec URL here
 ========================================= */
 
 const WORKER_URL = 'https://script.google.com/macros/s/AKfycbwXyJba9KlRh2K4QZg0bG_wARlXPZESb4h55sL15n4fThwWQS41j38yODSKHqdyVVbA1w/exec';
@@ -212,8 +213,6 @@ const ID_FILES = {
 };
 
 const REQUIRE_MATCH = true;
-const REQUIRE_TOKEN = false;
-const SECRET = 'PBHCFHBFXDSZAFCHBLNJNJHVHBBHFGHJKNJBVCFWDERDFHJOLPNBVDTYVUINJBBJ';
 const LS_KEY = 'gamecopy_history_v1';
 const LS_MAX = 50;
 
@@ -223,9 +222,9 @@ const LS_MAX = 50;
 
 const ID_KEYS = Object.keys(ID_FILES).sort((a,b) => b.length - a.length);
 
-const input  = document.getElementById('secret');
-const btn    = document.getElementById('send');
-const status = document.getElementById('status');
+const input   = document.getElementById('secret');
+const btn     = document.getElementById('send');
+const status  = document.getElementById('status');
 const toastEl = document.getElementById('toast');
 
 const overlay            = document.getElementById('downloadOverlay');
@@ -273,8 +272,8 @@ function showSuccess(gameName, logSaved) {
   overlay.classList.add('success');
   loadingTitle.textContent = 'Download started!';
   loadingDescription.textContent = logSaved
-    ? 'Your request was saved and the file is downloading.'
-    : 'File is downloading (server log could not be saved).';
+    ? 'Saved to server and downloading.'
+    : 'Downloading (server log not saved).';
   loadingGame.textContent = gameName;
   loadingStatus.textContent = 'Completed';
   loadingIcon.textContent = '✓';
@@ -284,4 +283,291 @@ function showSuccess(gameName, logSaved) {
   }, 1800);
 }
 
-function showError(msg)
+function showError(msg) {
+  clearTimeout(overlayTimer);
+  overlay.classList.remove('success');
+  loadingTitle.textContent = 'Something went wrong';
+  loadingDescription.textContent = msg;
+  loadingStatus.textContent = 'Please try again';
+  loadingIcon.textContent = '!';
+  overlayTimer = setTimeout(() => overlay.classList.remove('active'), 2600);
+}
+
+function hideOverlay() {
+  clearTimeout(overlayTimer);
+  overlay.classList.remove('active');
+  overlay.classList.remove('success');
+}
+
+/* =========================================
+   ID DETECTION
+========================================= */
+
+function detectId(text) {
+  if (!text) return null;
+  for (const id of ID_KEYS) {
+    if (text.includes(id)) return id;
+  }
+  return null;
+}
+
+function resolve(text) {
+  const id = detectId(text);
+  const entry = id ? ID_FILES[id] : null;
+  return { id, file: entry ? entry.file : null };
+}
+
+function updateHint() {
+  const raw = input.value;
+  if (!raw.trim()) { setStatus(''); return; }
+  const m = resolve(raw);
+  if (m.id) {
+    setStatus('✔ ID ' + m.id + ' → ' + m.file, 'ok');
+  } else {
+    setStatus('✖ Unknown ID — cannot send', 'bad');
+  }
+}
+
+/* =========================================
+   SAVE TO localStorage
+========================================= */
+
+function saveLocal(raw, id, file) {
+  try {
+    const hist = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+    hist.unshift({ raw, id, file, at: Date.now() });
+    localStorage.setItem(LS_KEY, JSON.stringify(hist.slice(0, LS_MAX)));
+  } catch (e) { /* quota / disabled — ignore */ }
+}
+
+/* =========================================
+   DOWNLOAD BLOB
+========================================= */
+
+function triggerDownload(content, fileName) {
+  const blob = new Blob([content], { type: 'application/octet-stream' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* =========================================
+   SEND
+========================================= */
+
+async function handleSend() {
+  const raw = input.value;
+
+  if (!raw.trim()) {
+    toast('Nothing to send — paste something first');
+    input.classList.add('shake');
+    setTimeout(() => input.classList.remove('shake'), 400);
+    input.focus();
+    return;
+  }
+
+  const m = resolve(raw);
+
+  if (REQUIRE_MATCH && !m.id) {
+    toast('Unknown ID — nothing sent');
+    setStatus('✖ Unknown ID — cannot send', 'bad');
+    return;
+  }
+
+  btn.disabled = true;
+  setStatus('Sending...');
+  showLoading(m.file);
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ id: m.id, raw })
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    const data = await res.json();
+
+    if (!data.success) throw new Error(data.error || 'Server error');
+
+    saveLocal(raw, m.id, m.file);
+    triggerDownload(data.data, data.fileName);
+
+    input.value = '';
+    setStatus('Downloaded: ' + m.file, 'ok');
+    showSuccess(m.file, !!data.logSaved);
+    input.focus();
+
+  } catch (err) {
+    console.error(err);
+    hideOverlay();
+    showError(err.message);
+    toast('❌ ' + err.message);
+    setStatus('Failed: ' + err.message, 'bad');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* =========================================
+   EVENTS
+========================================= */
+
+btn.addEventListener('click', handleSend);
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); handleSend(); }
+});
+
+input.addEventListener('input', updateHint);
+input.addEventListener('paste', () => setTimeout(updateHint, 0));
+
+/* =========================================
+   PARTICLE BACKGROUND
+========================================= */
+
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let width, height, particles = [];
+const mouse = { x: -1000, y: -1000, active: false };
+const isMobile = window.matchMedia('(pointer: coarse)').matches;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const count = Math.min(Math.floor(width * height / 7500), isMobile ? 45 : 115);
+  particles = [];
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - .5) * .4,
+      vy: (Math.random() - .5) * .4,
+      radius: Math.random() * 1.8 + .5,
+      alpha: Math.random() * .55 + .2,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+window.addEventListener('resize', resize);
+resize();
+
+function animateParticles() {
+  ctx.clearRect(0, 0, width, height);
+  const time = performance.now() * .001;
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    p.phase += .008;
+    if (!reducedMotion) {
+      p.x += p.vx; p.y += p.vy;
+      p.x += Math.sin(p.phase) * .12;
+      p.y += Math.cos(p.phase) * .12;
+    }
+    if (p.x < 0) p.x = width; if (p.x > width) p.x = 0;
+    if (p.y < 0) p.y = height; if (p.y > height) p.y = 0;
+    if (mouse.active && !isMobile) {
+      const dx = p.x - mouse.x, dy = p.y - mouse.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 135 && d > 0) {
+        const f = (135 - d) / 135;
+        p.x += (dx / d) * f * 2;
+        p.y += (dy / d) * f * 2;
+      }
+    }
+    const glow = .7 + Math.sin(time * 2 + p.phase) * .25;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(220,235,255,${p.alpha * glow})`;
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = 'rgba(120,170,255,.9)';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    for (let j = i + 1; j < particles.length; j++) {
+      const o = particles[j];
+      const dx = p.x - o.x, dy = p.y - o.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 115) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(o.x, o.y);
+        ctx.strokeStyle = `rgba(130,170,255,${(1 - d/115) * .16})`;
+        ctx.lineWidth = .7;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+/* =========================================
+   MOUSE GLOW
+========================================= */
+
+const mouseGlow = document.getElementById('mouseGlow');
+let glowX = -500, glowY = -500;
+
+if (!isMobile) {
+  window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true;
+    mouseGlow.style.opacity = '1';
+    glowX += (e.clientX - glowX) * .18;
+    glowY += (e.clientY - glowY) * .18;
+    mouseGlow.style.left = glowX + 'px';
+    mouseGlow.style.top  = glowY + 'px';
+  });
+  document.addEventListener('mouseleave', () => {
+    mouse.active = false;
+    mouseGlow.style.opacity = '0';
+  });
+}
+
+/* =========================================
+   CLICK EFFECTS
+========================================= */
+
+function createClickEffect(x, y) {
+  const ring = document.createElement('div');
+  ring.className = 'click-ring';
+  ring.style.left = x + 'px';
+  ring.style.top  = y + 'px';
+  document.body.appendChild(ring);
+  setTimeout(() => ring.remove(), 700);
+
+  for (let i = 0; i < 9; i++) {
+    const pt = document.createElement('div');
+    pt.className = 'click-particle';
+    const a = Math.random() * Math.PI * 2;
+    const d = 25 + Math.random() * 45;
+    pt.style.left = x + 'px';
+    pt.style.top  = y + 'px';
+    pt.style.setProperty('--x', Math.cos(a) * d + 'px');
+    pt.style.setProperty('--y', Math.sin(a) * d + 'px');
+    document.body.appendChild(pt);
+    setTimeout(() => pt.remove(), 700);
+  }
+}
+
+if (!reducedMotion) {
+  document.addEventListener('pointerdown', e => createClickEffect(e.clientX, e.clientY));
+}
+
+})();
+</script>
+
+</body>
+</html>
