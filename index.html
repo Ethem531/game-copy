@@ -389,11 +389,30 @@ button:disabled { opacity:.55;cursor:default;transform:none; }
 ========================================= */
 
 const ID_FILES = {
-  '123923334828954': 'place 123923334828954 Steal a Brainrot.rbxlx',
-  '120219252362013': 'place 120219252362013 Throw Food For Animals.rbxlx',
-  '107778070777162': 'place 107778070777162 Steal An Egg.rbxlx',
-  '17625359962': 'place 17625359962 RIVALS.rbxlx',
-  '142823291': 'place 142823291 Murder Mystery 2.rbxlx'
+  '123923334828954': {
+    driveId: '1TXjkOYxR-Z4bWWnu2vb-txwMTOHeAANz',
+    file: 'Steal a Brainrot'
+  },
+
+  '120219252362013': {
+    driveId: '1_H9b8Yc657_JLDKEtrudsYUPc2hS7WE0',
+    file: 'Throw Food For Animals'
+  },
+
+  '107778070777162': {
+    driveId: '1mqdLm8TW1YJ5qULtevT7U0-h2lKjaVh1',
+    file: 'Steal An Egg'
+  },
+
+  '17625359962': {
+    driveId: '1UtT7CGgstQ3uUTRFwRws0nmYV33knmAA',
+    file: 'RIVALS'
+  },
+
+  '142823291': {
+    driveId: '1JxGsnq6rjyHJzcKdyXfqOD_1Ue890RfV',
+    file: 'Murder Mystery 2'
+  }
 };
 
 const REQUIRE_MATCH = true;
@@ -437,9 +456,9 @@ function setStatus(msg,kind) {
 function detectId(text) {
   if (!text) return null;
 
-  for (let i=0;i<ID_KEYS.length;i++) {
-    if (text.indexOf(ID_KEYS[i]) !== -1) {
-      return ID_KEYS[i];
+  for (const id of ID_KEYS) {
+    if (text.includes(id)) {
+      return id;
     }
   }
 
@@ -448,10 +467,12 @@ function detectId(text) {
 
 function resolveFileName(text) {
   const id = detectId(text);
+  const entry = id ? ID_FILES[id] : null;
 
   return {
     id,
-    file: id ? ID_FILES[id] : null
+    driveId: entry ? entry.driveId : null,
+    file: entry ? entry.file : null
   };
 }
 
@@ -485,7 +506,7 @@ async function handleSend() {
   if (!raw.trim()) {
     toast('Nothing to send — paste something first');
     input.classList.add('shake');
-    setTimeout(() => input.classList.remove('shake'),400);
+    setTimeout(() => input.classList.remove('shake'), 400);
     input.focus();
     return;
   }
@@ -494,70 +515,42 @@ async function handleSend() {
 
   if (REQUIRE_MATCH && !match.id) {
     toast('Unknown ID — nothing sent');
-    setStatus('✖ Unknown ID — cannot send','bad');
+    setStatus('✖ Unknown ID — cannot send', 'bad');
+    return;
+  }
+
+  if (!match.id) {
+    toast('Unknown ID');
     return;
   }
 
   btn.disabled = true;
-  setStatus('Connecting to server…');
+  setStatus('Opening download...');
 
   try {
-    const payload = {
-      text: raw,
-      id: match.id || ''
-    };
-
-    const response = await fetch(WORKER_URL,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json'
-      },
-      body:JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        result.error || 'Server returned ' + response.status
-      );
-    }
-
-    if (!result.success) {
-      throw new Error(result.error || 'Download failed');
-    }
-
-    if (!result.data || !result.fileName) {
-      throw new Error('Invalid file response');
-    }
-
-    const blob = new Blob(
-      [result.data],
-      {type:'application/octet-stream'}
-    );
-
-    const urlBlob = URL.createObjectURL(blob);
+    const downloadURL =
+      WORKER_URL +
+      '/?id=' +
+      encodeURIComponent(match.id);
 
     const a = document.createElement('a');
-    a.href = urlBlob;
-    a.download = result.fileName;
+    a.href = downloadURL;
+    a.style.display = 'none';
 
     document.body.appendChild(a);
     a.click();
     a.remove();
 
-    setTimeout(() => URL.revokeObjectURL(urlBlob),3000);
-
-    toast('Download started: ' + result.fileName);
-    setStatus('File downloaded successfully!','ok');
+    toast('Download requested: ' + match.file);
+    setStatus('Download requested: ' + match.file, 'ok');
 
     input.value = '';
     input.focus();
 
-  } catch(err) {
+  } catch (err) {
     console.error(err);
     toast('❌ ' + err.message);
-    setStatus('Failed: ' + err.message,'bad');
+    setStatus('Failed: ' + err.message, 'bad');
 
   } finally {
     btn.disabled = false;
